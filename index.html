@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Flappy Bird Game</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    background: #078dff;
+    touch-action: manipulation;
+}
+
+#gameBox {
+    width: 100%;
+    max-width: 450px;
+    height: 100%;
+    height: 100dvh;
+    margin: auto;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(#078dff, #35d7ff 65%, #a7f5ff);
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: none;
+}
+
+.top {
+    position: absolute;
+    top: 10px;
+    left: 7px;
+    right: 7px;
+    display: flex;
+    gap: 5px;
+    z-index: 2;
+}
+
+.box {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 3px;
+    text-align: center;
+    color: white;
+    background: #071b3d;
+    border: 3px solid #00d9ff;
+    border-radius: 13px;
+    font-weight: bold;
+    box-shadow: 0 4px 0 #0453a1;
+    font-size: 13px;
+}
+
+.box strong {
+    display: block;
+    color: #ffe500;
+    font-size: 11px;
+    margin-bottom: 3px;
+}
+
+#score {
+    font-size: 23px;
+}
+
+.ad {
+    position: absolute;
+    z-index: 2;
+    top: 82px;
+    left: 5%;
+    width: 90%;
+    height: 48px;
+    border: 3px dashed #ff3025;
+    background: white;
+    color: red;
+    text-align: center;
+    padding: 5px;
+    font-weight: bold;
+    font-size: 17px;
+}
+
+.ad small {
+    display: block;
+    color: #071b3d;
+    font-size: 10px;
+}
+
+.bottom {
+    position: absolute;
+    z-index: 2;
+    bottom: 12px;
+    left: 5%;
+    width: 90%;
+    display: flex;
+    gap: 8px;
+}
+
+button {
+    cursor: pointer;
+    border: 3px solid #061632;
+    border-radius: 18px;
+    color: white;
+    font-size: 18px;
+    font-weight: 900;
+    padding: 14px 5px;
+    flex: 1;
+    background: linear-gradient(#13caff, #075dff);
+    text-shadow: 1px 2px #00142b;
+    box-shadow: 0 5px 0 #061632;
+}
+
+#playBtn {
+    background: linear-gradient(#7dff00, #12bb00);
+    font-size: 22px;
+}
+
+#settingsBtn {
+    background: linear-gradient(#e82bff, #7000ff);
+}
+
+#screen {
+    position: absolute;
+    z-index: 5;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 22px;
+    background: #00152cc9;
+}
+
+#card {
+    width: 100%;
+    text-align: center;
+    background: linear-gradient(145deg, #103567, #020c22);
+    border: 4px solid #00dfff;
+    border-radius: 25px;
+    padding: 24px 15px;
+    color: white;
+    box-shadow: 0 0 25px #00cfff;
+}
+
+.logo {
+    font-size: clamp(42px, 12vw, 65px);
+    font-weight: 1000;
+    line-height: 1;
+    color: #ffe600;
+    text-shadow: 3px 4px #ed4200, 5px 6px #000;
+    margin-bottom: 18px;
+}
+
+.logo span {
+    display: block;
+    color: white;
+    text-shadow: 3px 4px #267bff, 5px 6px #000;
+}
+
+#message {
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 12px 0 20px;
+}
+
+.menuButton {
+    width: 100%;
+    display: block;
+    margin-top: 12px;
+    padding: 14px;
+    background: linear-gradient(#7dff00, #0fbd00);
+    color: #061b05;
+    text-shadow: none;
+    font-size: 20px;
+}
+
+.secondary {
+    background: linear-gradient(#20d8ff, #0865ff);
+    color: white;
+    text-shadow: 1px 2px #00142b;
+}
+
+.hidden {
+    display: none !important;
+}
+
+@media (min-width: 451px) {
+    #gameBox {
+        border-left: 2px solid #00bfff;
+        border-right: 2px solid #00bfff;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="gameBox">
+
+    <canvas id="game"></canvas>
+
+    <div class="top">
+        <div class="box">
+            🪙 <span id="coins">0</span>
+            <strong>COINS</strong>
+        </div>
+
+        <div class="box">
+            <strong>HIGH SCORE</strong>
+            <span id="high">0</span>
+        </div>
+
+        <div class="box">
+            <strong>MISSION</strong>
+            <span id="mission">0 / 50</span>
+        </div>
+    </div>
+
+    <div class="ad">
+        350 × 50 Ad Space
+        <small>Your Ads Code Here</small>
+    </div>
+
+    <div class="bottom">
+        <button id="homeBtn">🏠 Home</button>
+        <button id="playBtn">▶ PLAY</button>
+        <button id="settingsBtn">⚙ Settings</button>
+    </div>
+
+    <div id="screen">
+        <div id="card">
+            <div class="logo">
+                FLAPPY
+                <span>BIRD</span>
+            </div>
+
+            <p id="message">
+                Collect Coins & Reach High Score!
+                <br>
+                Tap the screen to fly.
+            </p>
+
+            <button class="menuButton" id="startBtn">
+                ▶ START GAME
+            </button>
+
+            <button class="menuButton secondary" id="soundBtn">
+                🔊 SOUND: ON
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+"use strict";
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const screen = document.getElementById("screen");
+const message = document.getElementById("message");
+const startBtn = document.getElementById("startBtn");
+const playBtn = document.getElementById("playBtn");
+const homeBtn = document.getElementById("homeBtn");
+const settingsBtn = document.getElementById("settingsBtn");
+const soundBtn = document.getElementById("soundBtn");
+
+const coinText = document.getElementById("coins");
+const highText = document.getElementById("high");
+const missionText = document.getElementById("mission");
+
+const W = 360;
+const H = 640;
+
+let state = "menu";
+let bird;
+let pipes = [];
+let coins = [];
+
+let score = 0;
+let coinCount = getSaved("flappyCoins", 0);
+let highScore = getSaved("flappyHigh", 0);
+let missionCount = getSaved("flappyMission", 0);
+
+let lastTime = 0;
+let pipeTimer = 0;
+let groundOffset = 0;
+let soundOn = true;
+let audioContext = null;
+
+function getSaved(key, fallback) {
+    try {
+        const value = localStorage.getItem(key);
+        if (value === null) return fallback;
+
+        const number = Number(value);
+        return Number.isFinite(number) ? number : fallback;
+    } catch (error) {
+        return fallback;
+    }
+}
+
+function saveData() {
+    try {
+        localStorage.setItem("flappyCoins", coinCount);
+        localStorage.setItem("flappyHigh", highScore);
+        localStorage.setItem("flappyMission", missionCount);
+    } catch (error) {}
+}
+
+function updateUI() {
+    coinText.textContent = coinCount;
+    highText.textContent = highScore;
+    missionText.textContent =
+        Math.min(missionCount, 50) + " / 50";
+}
+
+function resizeCanvas() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
+function beep(frequency = 600, duration = 0.07) {
+    if (!soundOn) return;
+
+    try {
+        audioContext ||= new (
+            window.AudioContext || window.webkitAudioContext
+        )();
+
+        if (audioContext.state === "suspended") {
+            audioContext.resume();
+        }
+
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+
+        oscillator.frequency.value = frequency;
+        gain.gain.value = 0.035;
+
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+
+        oscillator.start();
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.001,
+            audioContext.currentTime + duration
+        );
+
+        oscillator.stop(audioContext.currentTime + duration);
+    } catch (error) {}
+}
+
+function resetGame() {
+    score = 0;
+    pipeTimer = 0.8;
+    groundOffset = 0;
+
+    bird = {
+        x: 95,
+        y: 310,
+        velocity: 0,
+        radius: 13,
+        rotation: 0
+    };
+
+    pipes = [];
+    coins = [];
+
+    lastTime = 0;
+}
+
+function startGame() {
+    resetGame();
+
+    state = "playing";
+    screen.classList.add("hidden");
+
+    playBtn.textContent = "⏸ PAUSE";
+
+    beep(500);
+}
+
+function showMenu(title, text, buttonText) {
+    state = "menu";
+
+    screen.classList.remove("hidden");
+
+    message.innerHTML = text;
+    startBtn.textContent = buttonText;
+
+    playBtn.textContent = "▶ PLAY";
+}
+
+function goHome() {
+    showMenu(
+        "FLAPPY BIRD",
+        "Collect Coins & Reach High Score!<br>Tap the screen to fly.",
+        "▶ START GAME"
+    );
+
+    resetGame();
+}
+
+function flap() {
+    if (state === "playing") {
+        bird.velocity = -350;
+        beep(550, 0.05);
+    }
+}
+
+function gameOver() {
+    if (state !== "playing") return;
+
+    state = "over";
+
+    highScore = Math.max(highScore, score);
+
+    saveData();
+    updateUI();
+
+    beep(180, 0.2);
+
+    showMenu(
+        "GAME OVER",
+        "Your Score: <b>" + score +
+        "</b><br>High Score: <b>" + highScore +
+        "</b><br>Coins: <b>" + coinCount + "</b>",
+        "↻ PLAY AGAIN"
+    );
+}
+
+function createPipe() {
+    const gap = 165;
+    const gapY = 180 + Math.random() * 240;
+
+    pipes.push({
+        x: W + 10,
+        width: 57,
+        gapY: gapY,
+        gap: gap,
+        passed: false
+    });
+
+    // A collectible coin is placed in the center of the gap.
+    coins.push({
+        x: W + 39,
+        y: gapY,
+        taken: false
+    });
+}
+
+function circleRectCollision(cx, cy, radius, rx, ry, rw, rh) {
+    const nearestX = Math.max(rx, Math.min(cx, rx + rw));
+    const nearestY = Math.max(ry, Math.min(cy, ry + rh));
+
+    const dx = cx - nearestX;
+    const dy = cy - nearestY;
+
+    return dx * dx + dy * dy < radius * radius;
+}
+
+function update(dt) {
+    if (state !== "playing") return;
+
+    // Bird physics
+    bird.velocity += 900 * dt;
+    bird.velocity = Math.min(bird.velocity, 450);
+
+    bird.y += bird.velocity * dt;
+
+    bird.rotation = Math.max(
+        -0.4,
+        Math.min(0.9, bird.velocity / 500)
+    );
+
+    // Pipes move at a stable speed.
+    const speed = 155 + Math.min(score, 30);
+
+    pipeTimer -= dt;
+
+    if (pipeTimer <= 0) {
+        createPipe();
+        pipeTimer = 1.65;
+    }
+
+    groundOffset = (groundOffset + speed * dt) % 36;
+
+    for (const pipe of pipes) {
+        pipe.x -= speed * dt;
+
+        const topHeight = pipe.gapY - pipe.gap / 2;
+        const bottomY = pipe.gapY + pipe.gap / 2;
+
+        // Check collisions against the pipes.
+        if (
+            circleRectCollision(
+                bird.x, bird.y, bird.radius,
+                pipe.x, 0, pipe.width, topHeight
+            ) ||
+            circleRectCollision(
+                bird.x, bird.y, bird.radius,
+                pipe.x, bottomY, pipe.width, H - bottomY
+            )
+        ) {
+            gameOver();
+            return;
+        }
+
+        if (!pipe.passed && pipe.x + pipe.width < bird.x) {
+            pipe.passed = true;
+
+            score++;
+
+            highScore = Math.max(highScore, score);
+
+            highText.textContent = highScore;
+
+            beep(750, 0.04);
+            saveData();
+        }
+    }
+
+    pipes = pipes.filter(pipe => pipe.x > -80);
+
+    // Move and collect coins.
+    for (const coin of coins) {
+        coin.x -= speed * dt;
+
+        if (
+            !coin.taken &&
+            Math.hypot(
+                bird.x - coin.x,
+                bird.y - coin.y
+            ) < 28
+        ) {
+            coin.taken = true;
+
+            coinCount++;
+            missionCount++;
+
+            updateUI();
+            saveData();
+
+            beep(1000, 0.08);
+        }
+    }
+
+    coins = coins.filter(
+        coin => coin.x > -30 && !coin.taken
+    );
+
+    // Ceiling and ground collision.
+    if (
+        bird.y - bird.radius < 0 ||
+        bird.y + bird.radius > H - 55
+    ) {
+        gameOver();
+    }
+}
+
+function roundedRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, r);
+}
+
+function drawBackground() {
+    const sky = ctx.createLinearGradient(0, 0, 0, H);
+
+    sky.addColorStop(0, "#0788ff");
+    sky.addColorStop(0.65, "#38d8ff");
+    sky.addColorStop(1, "#b0f7ff");
+
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H);
+
+    // Clouds
+    drawCloud(40, 210, 1);
+    drawCloud(290, 270, 0.75);
+    drawCloud(145, 365, 0.65);
+
+    // Distant city
+    ctx.fillStyle = "rgba(25,128,205,0.35)";
+
+    for (let x = 0; x < W; x += 35) {
+        const height = 35 + ((x * 7) % 65);
+
+        ctx.fillRect(
+            x,
+            H - 110 - height,
+            27,
+            height
+        );
+
+        ctx.fillStyle = "rgba(255,255,255,0.35)";
+
+        for (let wy = H - 105 - height; wy < H - 115; wy += 14) {
+            ctx.fillRect(x + 5, wy, 5, 6);
+            ctx.fillRect(x + 16, wy, 5, 6);
+        }
+
+        ctx.fillStyle = "rgba(25,128,205,0.35)";
+    }
+
+    // Bushes
+    ctx.fillStyle = "#22ce28";
+
+    for (let x = -10; x < W + 20; x += 28) {
+        ctx.beginPath();
+        ctx.arc(
+            x,
+            H - 68 + Math.sin(x) * 5,
+            22,
+            0,
+            Math.PI * 2
+        );
+        ctx.fill();
+    }
+}
+
+function drawCloud(x, y, scale) {
+    ctx.save();
+
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+
+    ctx.beginPath();
+    ctx.arc(0, 10, 17, 0, Math.PI * 2);
+    ctx.arc(18, 0, 24, 0, Math.PI * 2);
+    ctx.arc(40, 11, 18, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+}
+
+function drawPipe(pipe) {
+    const topHeight = pipe.gapY - pipe.gap / 2;
+    const bottomY = pipe.gapY + pipe.gap / 2;
+
+    const gradient = ctx.createLinearGradient(
+        pipe.x, 0, pipe.x + pipe.width, 0
+    );
+
+    gradient.addColorStop(0, "#139900");
+    gradient.addColorStop(0.45, "#76ff21");
+    gradient.addColorStop(1, "#16b900");
+
+    ctx.fillStyle = gradient;
+    ctx.strokeStyle = "#08762a";
+    ctx.lineWidth = 4;
+
+    // Upper pipe
+    ctx.fillRect(pipe.x, 0, pipe.width, topHeight);
+    ctx.strokeRect(pipe.x, -3, pipe.width, topHeight + 3);
+
+    ctx.fillRect(
+        pipe.x - 6,
+        topHeight - 24,
+        pipe.width + 12,
+        24
+    );
+
+    ctx.strokeRect(
+        pipe.x - 6,
+        topHeight - 24,
+        pipe.width + 12,
+        24
+    );
+
+    // Lower pipe
+    ctx.fillRect(
+        pipe.x,
+        bottomY,
+        pipe.width,
+        H - bottomY
+    );
+
+    ctx.strokeRect(
+        pipe.x,
+        bottomY,
+        pipe.width,
+        H - bottomY
+    );
+
+    ctx.fillRect(
+        pipe.x - 6,
+        bottomY,
+        pipe.width + 12,
+        24
+    );
+
+    ctx.strokeRect(
+        pipe.x - 6,
+        bottomY,
+        pipe.width + 12,
+        24
+    );
+}
+
+function drawCoin(coin) {
+    ctx.save();
+
+    ctx.translate(coin.x, coin.y);
+
+    ctx.shadowColor = "#fff28a";
+    ctx.shadowBlur = 14;
+
+    ctx.fillStyle = "#ffae00";
+    ctx.beginPath();
+    ctx.arc(0, 0, 15, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = "#fff32b";
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = "#ffe82d";
+    ctx.font = "bold 23px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("$", 0, 1);
+
+    ctx.restore();
+}
+
+function drawBird() {
+    ctx.save();
+
+    ctx.translate(bird.x, bird.y);
+    ctx.rotate(bird.rotation);
+
+    // Tail feathers
+    ctx.fillStyle = "#ffdf00";
+
+    ctx.beginPath();
+    ctx.moveTo(-18, 0);
+    ctx.lineTo(-35, -15);
+    ctx.lineTo(-31, 3);
+    ctx.lineTo(-38, 12);
+    ctx.lineTo(-16, 12);
+    ctx.fill();
+
+    // Body
+    ctx.fillStyle = "#ffdc00";
+    ctx.strokeStyle = "#10182a";
+    ctx.lineWidth = 4;
+
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 24, 20, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // White belly
+    ctx.fillStyle = "#fff";
+
+    ctx.beginPath();
+    ctx.ellipse(5, 11, 13, 8, -0.3, 0, Math.PI);
+    ctx.fill();
+
+    // Wing
+    ctx.fillStyle = "#ff353b";
+    ctx.strokeStyle = "#8c1018";
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+    ctx.ellipse(-10, 4, 12, 8, -0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Eye
+    ctx.fillStyle = "#fff";
+    ctx.beginPath();
+    ctx.ellipse(10, -8, 8, 10, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#111";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.fillStyle = "#111";
+    ctx.beginPath();
+    ctx.arc(12, -7, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Beak
+    ctx.fillStyle = "#ff5a00";
+
+    ctx.beginPath();
+    ctx.moveTo(19, 0);
+    ctx.lineTo(35, 5);
+    ctx.lineTo(19, 10);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle = "#111";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.restore();
+}
+
+function drawGround() {
+    const groundY = H - 55;
+
+    ctx.fillStyle = "#37dc18";
+    ctx.fillRect(0, groundY, W, 15);
+
+    ctx.fillStyle = "#8aff31";
+    ctx.fillRect(0, groundY, W, 6);
+
+    ctx.fillStyle = "#ed9b3b";
+    ctx.fillRect(0, groundY + 15, W, 40);
+
+    ctx.fillStyle = "#c76a27";
+
+    for (
+        let x = -36 + groundOffset;
+        x < W + 36;
+        x += 36
+    ) {
+        ctx.beginPath();
+        ctx.moveTo(x, groundY + 15);
+        ctx.lineTo(x + 18, groundY + 27);
+        ctx.lineTo(x + 36, groundY + 15);
+        ctx.lineTo(x + 18, groundY + 40);
+        ctx.closePath();
+        ctx.fill();
+    }
+}
+
+function draw() {
+    drawBackground();
+
+    for (const pipe of pipes) {
+        drawPipe(pipe);
+    }
+
+    for (const coin of coins) {
+        drawCoin(coin);
+    }
+
+    if (bird) {
+        drawBird();
+    }
+
+    drawGround();
+
+    // Current score on the play field.
+    if (state === "playing") {
+        ctx.save();
+
+        ctx.font = "bold 42px Arial";
+        ctx.textAlign = "center";
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "#071b3d";
+        ctx.fillStyle = "#fff";
+
+        ctx.strokeText(score, W / 2, 175);
+        ctx.fillText(score, W / 2, 175);
+
+        ctx.restore();
+    }
+}
+
+function loop(time) {
+    const dt = lastTime
+        ? Math.min((time - lastTime) / 1000, 0.035)
+        : 0;
+
+    lastTime = time;
+
+    update(dt);
+    draw();
+
+    requestAnimationFrame(loop);
+}
+
+// Mobile touch and mouse controls.
+canvas.addEventListener("pointerdown", function (event) {
+    event.preventDefault();
+
+    if (state === "playing") {
+        flap();
+    } else if (state === "ready") {
+        startGame();
+        flap();
+    }
+});
+
+startBtn.addEventListener("click", function () {
+    startGame();
+});
+
+playBtn.addEventListener("click", function () {
+    if (state === "playing") {
+        state = "paused";
+
+        showMenu(
+            "PAUSED",
+            "Game paused.<br>Ready to continue?",
+            "▶ RESUME"
+        );
+
+        startBtn.onclick = function () {
+            state = "playing";
+            screen.classList.add("hidden");
+            startBtn.onclick = null;
+        };
+    } else if (state === "paused") {
+        state = "playing";
+        screen.classList.add("hidden");
+    } else {
+        startGame();
+    }
+});
+
+homeBtn.addEventListener("click", function () {
+    startBtn.onclick = null;
+    goHome();
+});
+
+settingsBtn.addEventListener("click", function () {
+    const previousState = state;
+
+    state = "settings";
+
+    showMenu(
+        "SETTINGS",
+        "Sound: " + (soundOn ? "ON 🔊" : "OFF 🔇") +
+        "<br><br>Sound button se setting badlein.",
+        "← BACK"
+    );
+
+    startBtn.onclick = function () {
+        startBtn.onclick = null;
+
+        if (previousState === "playing") {
+            state = "playing";
+            screen.classList.add("hidden");
+        } else {
+            goHome();
+        }
+    };
+});
+
+soundBtn.addEventListener("click", function () {
+    soundOn = !soundOn;
+
+    soundBtn.textContent = soundOn
+        ? "🔊 SOUND: ON"
+        : "🔇 SOUND: OFF";
+
+    beep(650);
+
+    if (state === "settings") {
+        message.innerHTML =
+            "Sound: " + (soundOn ? "ON 🔊" : "OFF 🔇") +
+            "<br><br>Sound button se setting badlein.";
+    }
+});
+
+document.addEventListener("keydown", function (event) {
+    if (
+        event.code === "Space" ||
+        event.code === "ArrowUp"
+    ) {
+        event.preventDefault();
+
+        if (state === "playing") {
+            flap();
+        } else if (state === "menu" || state === "over") {
+            startGame();
+            flap();
+        }
+    }
+});
+
+resetGame();
+updateUI();
+requestAnimationFrame(loop);
+
+</script>
+</body>
+</html>
