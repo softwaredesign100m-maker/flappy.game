@@ -1,173 +1,664 @@
-from pathlib import Path
-html = r'''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Flappy Bird - 100 Levels & Skin Garage</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Flappy Bird - 100 Levels</title>
+
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#071b3d;touch-action:manipulation}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Arial;background:#071b3d;touch-action:manipulation}
 #app{position:relative;width:min(100vw,56.25vh);height:min(100dvh,177.78vw);max-height:100dvh;margin:auto;overflow:hidden;background:#13bdf6}
 canvas{width:100%;height:100%;display:block;touch-action:none}
-.hud{position:absolute;top:max(8px,env(safe-area-inset-top));left:7px;right:7px;display:flex;gap:5px;z-index:2;pointer-events:none}
-.badge{flex:1;min-width:0;padding:7px 3px;text-align:center;color:#fff;background:#071b3d;border:2px solid #00d9ff;border-radius:12px;font-size:12px;font-weight:900;text-shadow:1px 2px #000;box-shadow:0 3px 0 #0453a1}
+
+.hud{position:absolute;top:8px;left:7px;right:7px;display:flex;gap:5px;z-index:2;pointer-events:none}
+.badge{flex:1;padding:7px 3px;text-align:center;color:#fff;background:#071b3d;border:2px solid #00d9ff;border-radius:12px;font-size:12px;font-weight:bold}
 .badge strong{display:block;color:#ffe500;font-size:10px;margin-bottom:3px}
-.ad{position:absolute;top:75px;left:5%;width:90%;height:45px;border:3px dashed #ff3025;background:#fff;color:red;text-align:center;padding:4px;font-weight:bold;font-size:16px;z-index:2;pointer-events:none}
+
+.ad{position:absolute;top:75px;left:5%;width:90%;height:45px;border:2px dashed #ff3025;background:#fff;color:red;text-align:center;padding:4px;font-weight:bold;font-size:14px;z-index:2;pointer-events:none}
 .ad small{display:block;color:#071b3d;font-size:10px}
-.bottom{position:absolute;z-index:2;bottom:max(12px,env(safe-area-inset-bottom));left:4%;width:92%;display:flex;gap:6px}
-button{cursor:pointer;border:3px solid #061632;border-radius:14px;color:white;font-size:clamp(12px,3.4vw,17px);font-weight:900;padding:12px 3px;flex:1;background:linear-gradient(#13caff,#075dff);text-shadow:1px 2px #00142b;box-shadow:0 4px 0 #061632}
-#playBtn{background:linear-gradient(#7dff00,#12bb00);font-size:clamp(15px,4vw,21px)}#garageBtn{background:linear-gradient(#f52cff,#7200ff)}
-.overlay{position:absolute;z-index:5;inset:0;display:flex;justify-content:center;align-items:center;padding:15px;background:#00152cd9}
-.card{width:100%;max-height:88%;overflow:auto;text-align:center;background:linear-gradient(145deg,#103567,#020c22);border:3px solid #00dfff;border-radius:22px;padding:19px 13px;color:white;box-shadow:0 0 25px #00cfff}
-.logo{font-size:clamp(38px,11vw,57px);font-weight:1000;line-height:.95;color:#ffe600;text-shadow:3px 4px #ed4200,5px 6px #000;margin-bottom:12px}.logo span{display:block;color:#fff;text-shadow:3px 4px #267bff,5px 6px #000}
-.card p{font-size:14px;line-height:1.45;margin:10px 0 15px}
-.menuButton{width:100%;display:block;margin-top:9px;padding:12px 8px;background:linear-gradient(#7dff00,#0fbd00);color:#061b05;text-shadow:none;font-size:18px}
-.secondary{background:linear-gradient(#20d8ff,#0865ff);color:white;text-shadow:1px 2px #00142b}
+
+.bottom{position:absolute;z-index:2;bottom:12px;left:4%;width:92%;display:flex;gap:6px}
+button{cursor:pointer;border:2px solid #061632;border-radius:12px;color:white;font-size:13px;font-weight:bold;padding:12px 3px;flex:1;background:linear-gradient(#13caff,#075dff)}
+#playBtn{background:linear-gradient(#7dff00,#12bb00);color:#062000}
+#garageBtn{background:linear-gradient(#f52cff,#7200ff)}
+
+.overlay{position:absolute;z-index:5;inset:0;display:flex;justify-content:center;align-items:center;padding:15px;background:#00152cdd}
+.card{width:100%;max-height:88%;overflow:auto;text-align:center;background:linear-gradient(145deg,#103567,#020c22);border:3px solid #00dfff;border-radius:22px;padding:18px 12px;color:white;box-shadow:0 0 25px #00cfff}
+.logo{font-size:48px;font-weight:1000;line-height:1;color:#ffe600;text-shadow:3px 4px #ed4200,5px 6px #000;margin-bottom:12px}
+.logo span{display:block;color:#fff;text-shadow:3px 4px #267bff}
+.card p{font-size:14px;line-height:1.5}
+.menuButton{width:100%;display:block;margin-top:9px;padding:13px 8px;background:linear-gradient(#7dff00,#0fbd00);color:#061b05;font-size:17px}
+.secondary{background:linear-gradient(#20d8ff,#0865ff);color:white}
 .hidden{display:none!important}
-.garage-head{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:10px}.garage-head h2{font-size:22px;color:#ffe600;margin:0}.garage-head button{flex:0 0 auto;padding:8px 12px}
+
+.garage-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.garage-head h2{font-size:22px;color:#ffe600;margin:0}
+.garage-head button{flex:0 0 auto;padding:8px 12px}
 .skin-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .skin{border:2px solid #32618c;border-radius:12px;padding:8px 3px;background:#071a35;min-width:0}
-.skin .preview{font-size:34px;display:block;line-height:1.4}.skin b{display:block;font-size:11px;overflow-wrap:anywhere}.skin small{display:block;color:#a9d8ff;font-size:10px;margin-top:4px}.skin button{font-size:11px;padding:7px 2px;margin-top:7px;border-radius:8px;border-width:1px;width:100%}
-.skin.selected{border-color:#7dff00;box-shadow:0 0 9px #54ff00}.skin.locked{opacity:.65}
-.progress-wrap{height:12px;background:#001127;border:1px solid #4d7297;border-radius:10px;overflow:hidden;margin:8px 0}.progress-bar{height:100%;width:0;background:linear-gradient(90deg,#85ff00,#00d9ff)}
+.skin .preview{font-size:32px;display:block;line-height:1.4}
+.skin b{display:block;font-size:11px}
+.skin small{display:block;color:#a9d8ff;font-size:10px;margin-top:4px}
+.skin button{font-size:10px;padding:8px 1px;margin-top:7px;border-radius:8px;width:100%}
+.skin.selected{border-color:#7dff00;box-shadow:0 0 9px #54ff00}
+.skin.locked{opacity:.55}
+.progress-wrap{height:12px;background:#001127;border:1px solid #4d7297;border-radius:10px;overflow:hidden;margin:8px 0}
+.progress-bar{height:100%;background:linear-gradient(90deg,#85ff00,#00d9ff)}
 </style>
 </head>
+
 <body>
 <div id="app">
+
 <canvas id="game"></canvas>
+
 <div class="hud">
  <div class="badge">🪙 <span id="coins">0</span><strong>COINS</strong></div>
  <div class="badge"><strong>SCORE</strong><span id="score">0</span></div>
  <div class="badge"><strong>LEVEL</strong><span id="level">1 / 100</span></div>
 </div>
-<div class="ad">350 × 50 Ad Space<small>Your Ads Code Here</small></div>
+
+<div class="ad">350 × 50 AD SPACE<small>Your Ad Code Here</small></div>
+
 <div class="bottom">
- <button id="homeBtn">🏠 HOME</button><button id="playBtn">▶ PLAY</button><button id="garageBtn">🎨 GARAGE</button>
+ <button id="homeBtn">🏠 HOME</button>
+ <button id="playBtn">▶ PLAY</button>
+ <button id="garageBtn">🎨 GARAGE</button>
 </div>
-<div class="overlay" id="overlay"><div class="card">
- <div class="logo">FLAPPY<span>BIRD</span></div>
- <p id="message">Har 20 pipes cross karne par next level unlock hoga. Har level par nayi skin milegi! Total 100 levels.</p>
- <button class="menuButton" id="startBtn">▶ START GAME</button>
- <button class="menuButton secondary" id="openGarageBtn">🎨 OPEN SKIN GARAGE</button>
- <button class="menuButton secondary" id="soundBtn">🔊 SOUND: ON</button>
-</div></div>
+
+<div class="overlay" id="overlay">
+ <div class="card">
+  <div class="logo">FLAPPY<span>BIRD</span></div>
+  <p>Har 20 pipes cross karne par next level unlock karein. Garage mein apni bird skin select karein!</p>
+  <button class="menuButton" id="startBtn">▶ START GAME</button>
+  <button class="menuButton secondary" id="openGarageBtn">🎨 OPEN SKIN GARAGE</button>
+  <button class="menuButton secondary" id="soundBtn">🔊 SOUND: ON</button>
+ </div>
 </div>
+
+</div>
+
 <script>
 (() => {
-'use strict';
-const $=id=>document.getElementById(id), canvas=$('game'),ctx=canvas.getContext('2d');
-const W=360,H=640,app=$('app');
-const skins=[
- {name:'Classic',emoji:'🐤',color:'#ffdc00'},
- {name:'Blue Jay',emoji:'🐦',color:'#28a9ff'},
- {name:'Red Bird',emoji:'🐣',color:'#ff514b'},
- {name:'Green Bird',emoji:'🐥',color:'#70f32c'},
- {name:'Purple Bird',emoji:'🦜',color:'#c45cff'},
- {name:'Golden Bird',emoji:'🐤',color:'#ffb700'},
- {name:'Snow Bird',emoji:'🕊️',color:'#ffffff'},
- {name:'Flame Bird',emoji:'🔥',color:'#ff6b00'},
- {name:'Night Owl',emoji:'🦉',color:'#8a9bff'},
- {name:'Pink Bird',emoji:'🐦',color:'#ff7ac8'},
- {name:'Cyan Bird',emoji:'🐤',color:'#3affed'},
- {name:'Royal Bird',emoji:'👑',color:'#ffdc00'}
+"use strict";
+
+const $ = id => document.getElementById(id);
+const canvas = $("game");
+const ctx = canvas.getContext("2d");
+const app = $("app");
+
+const W = 360, H = 640;
+
+const skins = [
+ {name:"Classic",emoji:"🐤",color:"#ffdc00"},
+ {name:"Blue Bird",emoji:"🐦",color:"#28a9ff"},
+ {name:"Red Bird",emoji:"🐣",color:"#ff514b"},
+ {name:"Green Bird",emoji:"🐥",color:"#70f32c"},
+ {name:"Purple Bird",emoji:"🦜",color:"#c45cff"},
+ {name:"Golden Bird",emoji:"🐤",color:"#ffb700"},
+ {name:"Snow Bird",emoji:"🕊️",color:"#ffffff"},
+ {name:"Flame Bird",emoji:"🔥",color:"#ff6b00"},
+ {name:"Night Owl",emoji:"🦉",color:"#8a9bff"},
+ {name:"Pink Bird",emoji:"🐦",color:"#ff7ac8"},
+ {name:"Cyan Bird",emoji:"🐤",color:"#3affed"},
+ {name:"Royal Bird",emoji:"👑",color:"#ffdc00"}
 ];
-let state='menu',bird,pipes=[],coins=[],score=0,coinsTotal=load('fb_coins',0),best=load('fb_best',0);
-let unlocked=load('fb_unlocked',1),selected=load('fb_skin',0),sound=true,audio=null,last=0,pipeTimer=0,ground=0,levelNotice=0;
-unlocked=Math.max(1,Math.min(100,unlocked));selected=Math.max(0,Math.min(skins.length-1,selected));
-function load(k,d){try{let v=localStorage.getItem(k);return v===null?d:Number(v)}catch(e){return d}}
-function save(){try{localStorage.setItem('fb_coins',coinsTotal);localStorage.setItem('fb_best',best);localStorage.setItem('fb_unlocked',unlocked);localStorage.setItem('fb_skin',selected)}catch(e){}}
-function ui(){$('coins').textContent=coinsTotal;$('score').textContent=score;$('level').textContent=unlocked+' / 100'}
-function resize(){let r=app.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(r.width*d);canvas.height=Math.round(r.height*d);ctx.setTransform(canvas.width/W,0,0,canvas.height/H,0,0)}
-window.addEventListener('resize',resize);resize();
-function beep(f=600,d=.06){if(!sound)return;try{audio ||= new(window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume();let o=audio.createOscillator(),g=audio.createGain();o.frequency.value=f;g.gain.value=.035;o.connect(g);g.connect(audio.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+d);o.stop(audio.currentTime+d)}catch(e){}}
-function reset(){score=0;pipeTimer=.7;ground=0;bird={x:94,y:310,vy:0,r:13,rot:0};pipes=[];coins=[];ui()}
-function hide(){ $('overlay').classList.add('hidden') }
-function show(title,body,buttons){$('overlay').classList.remove('hidden');$('overlay').innerHTML=`<div class="card">${title}${body}${buttons}</div>`}
-function menu(title='FLAPPY<span>BIRD</span>',text='Har 20 pipes cross karne par next level unlock hoga. Har level par nayi skin milegi! Total 100 levels.',button='▶ START GAME'){
- state='menu';$('overlay').classList.remove('hidden');
- $('overlay').innerHTML=`<div class="card"><div class="logo">${title}</div><p id="message">${text}</p><button class="menuButton" id="startBtn">${button}</button><button class="menuButton secondary" id="openGarageBtn">🎨 OPEN SKIN GARAGE</button><button class="menuButton secondary" id="soundBtn">${sound?'🔊':'🔇'} SOUND: ${sound?'ON':'OFF'}</button></div>`;
- $('startBtn').onclick=startGame;$('openGarageBtn').onclick=openGarage;$('soundBtn').onclick=()=>{sound=!sound;menu(title,text,button)};
+
+function load(key, fallback){
+ try {
+  const value = localStorage.getItem(key);
+  return value === null ? fallback : Number(value);
+ } catch(e) { return fallback; }
 }
-function startGame(){reset();state='playing';hide();$('playBtn').textContent='⏸ PAUSE';last=0;beep(500)}
-function endGame(){if(state!=='playing')return;state='over';best=Math.max(best,score);save();ui();beep(160,.2);menu('GAME OVER',`Score: <b>${score}</b><br>Best: <b>${best}</b><br>Unlocked level: <b>${unlocked}/100</b>`,'↻ PLAY AGAIN');$('playBtn').textContent='▶ PLAY'}
+
+let state = "menu";
+let bird, pipes = [], coins = [];
+let score = 0;
+let coinsTotal = load("fb_coins",0);
+let best = load("fb_best",0);
+let unlocked = Math.max(1,Math.min(100,load("fb_unlocked",1)));
+let selected = Math.max(0,Math.min(skins.length-1,load("fb_skin",0)));
+let sound = true;
+let audio = null;
+let last = 0;
+let pipeTimer = 0;
+let ground = 0;
+
+function save(){
+ try{
+  localStorage.setItem("fb_coins",coinsTotal);
+  localStorage.setItem("fb_best",best);
+  localStorage.setItem("fb_unlocked",unlocked);
+  localStorage.setItem("fb_skin",selected);
+ }catch(e){}
+}
+
+function updateUI(){
+ $("coins").textContent = coinsTotal;
+ $("score").textContent = score;
+ $("level").textContent = unlocked + " / 100";
+}
+
+function resize(){
+ const r = app.getBoundingClientRect();
+ const d = Math.min(window.devicePixelRatio || 1,2);
+ canvas.width = Math.round(r.width*d);
+ canvas.height = Math.round(r.height*d);
+ ctx.setTransform(canvas.width/W,0,0,canvas.height/H,0,0);
+}
+window.addEventListener("resize",resize);
+resize();
+
+function beep(freq=600,duration=.06){
+ if(!sound) return;
+ try{
+  audio ||= new (window.AudioContext || window.webkitAudioContext)();
+  if(audio.state==="suspended") audio.resume();
+  const o=audio.createOscillator();
+  const g=audio.createGain();
+  o.frequency.value=freq;
+  g.gain.value=.035;
+  o.connect(g);
+  g.connect(audio.destination);
+  o.start();
+  g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);
+  o.stop(audio.currentTime+duration);
+ }catch(e){}
+}
+
+function reset(){
+ score=0;
+ pipeTimer=.7;
+ ground=0;
+ bird={x:94,y:310,vy:0,r:13,rot:0};
+ pipes=[];
+ coins=[];
+ updateUI();
+}
+
+function hideOverlay(){
+ $("overlay").classList.add("hidden");
+}
+
+function showMenu(title,text,buttonText="▶ START GAME"){
+ state="menu";
+ $("overlay").classList.remove("hidden");
+ $("overlay").innerHTML=`
+ <div class="card">
+  <div class="logo">${title}</div>
+  <p>${text}</p>
+  <button class="menuButton" id="startBtn">${buttonText}</button>
+  <button class="menuButton secondary" id="openGarageBtn">🎨 OPEN SKIN GARAGE</button>
+  <button class="menuButton secondary" id="soundBtn">${sound?"🔊":"🔇"} SOUND: ${sound?"ON":"OFF"}</button>
+ </div>`;
+
+ $("startBtn").onclick=startGame;
+ $("openGarageBtn").onclick=openGarage;
+ $("soundBtn").onclick=()=>{
+  sound=!sound;
+  showMenu(title,text,buttonText);
+ };
+}
+
+function startGame(){
+ reset();
+ state="playing";
+ hideOverlay();
+ $("playBtn").textContent="⏸ PAUSE";
+ last=0;
+ beep(500);
+}
+
+function endGame(){
+ if(state!=="playing") return;
+ state="over";
+ best=Math.max(best,score);
+ save();
+ updateUI();
+ $("playBtn").textContent="▶ PLAY";
+ beep(160,.2);
+ showMenu("GAME OVER",
+  `Score: <b>${score}</b><br>Best Score: <b>${best}</b><br>Unlocked Level: <b>${unlocked}/100</b>`,
+  "↻ PLAY AGAIN");
+}
+
 function openGarage(){
- state='garage';
- let cards='';
+ const previousState=state;
+ state="garage";
+
+ let cards="";
+
  for(let i=0;i<100;i++){
-  const level=i+1,skin=skins[i%skins.length],isUnlocked=level<=unlocked;
-  cards+=`<div class="skin ${isUnlocked?'':'locked'} ${selected===i%skins.length&&isUnlocked?'selected':''}">
-   <span class="preview">${skin.emoji}</span><b>Level ${level}</b><small>${isUnlocked?skin.name:'🔒 Unlock at level '+level}</small>
-   <button data-level="${level}" ${isUnlocked?'':'disabled'}>${isUnlocked?(selected===i%skins.length?'SELECTED':'USE SKIN'):'LOCKED'}</button>
+  const level=i+1;
+  const skin=skins[i%skins.length];
+  const available=level<=unlocked;
+  const isSelected=selected===i%skins.length && available;
+
+  cards+=`
+  <div class="skin ${available?"":"locked"} ${isSelected?"selected":""}">
+   <span class="preview">${skin.emoji}</span>
+   <b>Level ${level}</b>
+   <small>${available?skin.name:"🔒 Locked"}</small>
+   <button data-level="${level}" ${available?"":"disabled"}>
+    ${available?(isSelected?"SELECTED":"USE SKIN"):"LOCKED"}
+   </button>
   </div>`;
  }
- $('overlay').classList.remove('hidden');
- $('overlay').innerHTML=`<div class="card"><div class="garage-head"><h2>🎨 SKIN GARAGE</h2><button id="closeGarage">✕</button></div><p>Har 20 pipes pass karne par 1 level unlock hota hai. Har level ka skin reward unlock level par milta hai.</p><div>Level progress: ${unlocked}/100</div><div class="progress-wrap"><div class="progress-bar" style="width:${unlocked}%"></div></div><div class="skin-grid">${cards}</div><button class="menuButton secondary" id="garageBack">← BACK</button></div>`;
- $('closeGarage').onclick=closeGarage;$('garageBack').onclick=closeGarage;
- $('overlay').querySelectorAll('[data-level]').forEach(b=>b.onclick=()=>{let lv=Number(b.dataset.level);if(lv<=unlocked){selected=(lv-1)%skins.length;save();beep(850);openGarage()}});
+
+ $("overlay").classList.remove("hidden");
+ $("overlay").innerHTML=`
+ <div class="card">
+  <div class="garage-head">
+   <h2>🎨 SKIN GARAGE</h2>
+   <button id="closeGarage">✕</button>
+  </div>
+  <p>Har 20 pipes cross karne par ek naya level unlock karein!</p>
+  <div>Level Progress: ${unlocked}/100</div>
+  <div class="progress-wrap">
+   <div class="progress-bar" style="width:${unlocked}%"></div>
+  </div>
+  <div class="skin-grid">${cards}</div>
+  <button class="menuButton secondary" id="garageBack">← BACK</button>
+ </div>`;
+
+ $("closeGarage").onclick=closeGarage;
+ $("garageBack").onclick=closeGarage;
+
+ $("overlay").querySelectorAll("[data-level]").forEach(button=>{
+  button.onclick=()=>{
+   const level=Number(button.dataset.level);
+   if(level<=unlocked){
+    selected=(level-1)%skins.length;
+    save();
+    beep(850);
+    openGarage();
+   }
+  };
+ });
+
+ function closeGarage(){
+  if(previousState==="playing"){
+   state="playing";
+   hideOverlay();
+  }else{
+   showMenu("FLAPPY<span>BIRD</span>",
+   "Play the game, collect coins and unlock all 100 levels!");
+  }
+ }
 }
-function closeGarage(){if(state==='playing'){state='playing';hide()}else menu()}
-function fly(){if(state==='playing'){bird.vy=-345;beep(520,.04)}else if(state==='ready'){startGame();fly()}}
-function addPipe(){let gap=Math.max(148,168-Math.floor((unlocked-1)/10));let gapY=170+Math.random()*270;pipes.push({x:W+5,w:57,gapY,gap,passed:false});coins.push({x:W+34,y:gapY,taken:false})}
-function hit(cx,cy,r,rx,ry,rw,rh){let x=Math.max(rx,Math.min(cx,rx+rw)),y=Math.max(ry,Math.min(cy,ry+rh));return (cx-x)**2+(cy-y)**2<r*r}
+
+function fly(){
+ if(state==="playing"){
+  bird.vy=-345;
+  beep(520,.04);
+ }
+}
+
+function addPipe(){
+ const gap=Math.max(148,168-Math.floor((unlocked-1)/10));
+ const gapY=170+Math.random()*270;
+
+ pipes.push({
+  x:W+5,w:57,gapY,gap,passed:false
+ });
+
+ coins.push({
+  x:W+34,y:gapY,taken:false
+ });
+}
+
+function hit(cx,cy,r,rx,ry,rw,rh){
+ const x=Math.max(rx,Math.min(cx,rx+rw));
+ const y=Math.max(ry,Math.min(cy,ry+rh));
+ return (cx-x)**2+(cy-y)**2<r*r;
+}
+
 function update(dt){
- if(state!=='playing')return;
- bird.vy=Math.min(450,bird.vy+900*dt);bird.y+=bird.vy*dt;bird.rot=Math.max(-.4,Math.min(.9,bird.vy/500));
- let speed=155+Math.min(unlocked*0.45,45);pipeTimer-=dt;if(pipeTimer<=0){addPipe();pipeTimer=1.65}
+ if(state!=="playing") return;
+
+ bird.vy=Math.min(450,bird.vy+900*dt);
+ bird.y+=bird.vy*dt;
+ bird.rot=Math.max(-.4,Math.min(.9,bird.vy/500));
+
+ const speed=155+Math.min(unlocked*.45,45);
+
+ pipeTimer-=dt;
+ if(pipeTimer<=0){
+  addPipe();
+  pipeTimer=1.65;
+ }
+
  ground=(ground+speed*dt)%36;
- for(let p of pipes){
-  p.x-=speed*dt;let top=p.gapY-p.gap/2,bot=p.gapY+p.gap/2;
-  if(hit(bird.x,bird.y,bird.r,p.x,0,p.w,top)||hit(bird.x,bird.y,bird.r,p.x,bot,p.w,H-bot)){endGame();return}
-  if(!p.passed&&p.x+p.w<bird.x){
-   p.passed=true;score++;best=Math.max(best,score);$('score').textContent=score;beep(740,.04);
-   // Every 20 pipes passed in this run unlocks the next permanent level.
+
+ for(const p of pipes){
+  p.x-=speed*dt;
+
+  const top=p.gapY-p.gap/2;
+  const bottom=p.gapY+p.gap/2;
+
+  if(
+   hit(bird.x,bird.y,bird.r,p.x,0,p.w,top) ||
+   hit(bird.x,bird.y,bird.r,p.x,bottom,p.w,H-bottom)
+  ){
+   endGame();
+   return;
+  }
+
+  if(!p.passed && p.x+p.w<bird.x){
+   p.passed=true;
+   score++;
+   best=Math.max(best,score);
+
+   $("score").textContent=score;
+   beep(740,.04);
+
+   // Har 20 pipes par ek permanent level unlock hota hai.
    const reached=Math.min(100,Math.floor(score/20)+1);
-   if(reached>unlocked){unlocked=reached;save();ui();levelNotice=2.2;beep(1050,.15);menu('🎉 LEVEL UNLOCKED!',`Congratulations! Level <b>${unlocked}</b> unlocked.<br>New skin reward: <b>${skins[(unlocked-1)%skins.length].name}</b> ${skins[(unlocked-1)%skins.length].emoji}<br>Open Skin Garage to equip it.`,'CONTINUE');state='levelup';return}
+
+   if(reached>unlocked){
+    unlocked=reached;
+    save();
+    updateUI();
+
+    const reward=skins[(unlocked-1)%skins.length];
+
+    state="levelup";
+    $("playBtn").textContent="▶ CONTINUE";
+
+    $("overlay").classList.remove("hidden");
+    $("overlay").innerHTML=`
+     <div class="card">
+      <div class="logo">LEVEL UP!</div>
+      <p>🎉 Congratulations!<br>
+      Level <b>${unlocked}</b> unlocked!<br>
+      New skin reward: ${reward.emoji}<br>
+      <b>${reward.name}</b></p>
+      <button class="menuButton" id="continueBtn">▶ CONTINUE</button>
+      <button class="menuButton secondary" id="levelGarageBtn">🎨 SKIN GARAGE</button>
+     </div>`;
+
+    $("continueBtn").onclick=()=>{
+     state="playing";
+     hideOverlay();
+    };
+
+    $("levelGarageBtn").onclick=openGarage;
+    return;
+   }
+
    save();
   }
  }
+
  pipes=pipes.filter(p=>p.x>-80);
- for(let c of coins){c.x-=speed*dt;if(!c.taken&&Math.hypot(bird.x-c.x,bird.y-c.y)<27){c.taken=true;coinsTotal++;beep(950,.07);save();ui()}}
+
+ for(const c of coins){
+  c.x-=speed*dt;
+
+  if(!c.taken && Math.hypot(bird.x-c.x,bird.y-c.y)<27){
+   c.taken=true;
+   coinsTotal++;
+   beep(950,.07);
+   save();
+   updateUI();
+  }
+ }
+
  coins=coins.filter(c=>c.x>-25&&!c.taken);
- if(bird.y<0||bird.y+bird.r>H-55){endGame()}
+
+ if(bird.y<0 || bird.y+bird.r>H-55){
+  endGame();
+ }
 }
-function cloud(x,y,s=1){ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.fillStyle='rgba(255,255,255,.82)';ctx.beginPath();ctx.arc(0,10,17,0,7);ctx.arc(18,0,24,0,7);ctx.arc(40,11,18,0,7);ctx.fill();ctx.restore()}
+
+function cloud(x,y,s=1){
+ ctx.save();
+ ctx.translate(x,y);
+ ctx.scale(s,s);
+ ctx.fillStyle="rgba(255,255,255,.82)";
+ ctx.beginPath();
+ ctx.arc(0,10,17,0,7);
+ ctx.arc(18,0,24,0,7);
+ ctx.arc(40,11,18,0,7);
+ ctx.fill();
+ ctx.restore();
+}
+
 function drawPipe(p){
- let top=p.gapY-p.gap/2,bot=p.gapY+p.gap/2,g=ctx.createLinearGradient(p.x,0,p.x+p.w,0);g.addColorStop(0,'#159900');g.addColorStop(.45,'#75ff21');g.addColorStop(1,'#13b700');ctx.fillStyle=g;ctx.strokeStyle='#08762a';ctx.lineWidth=4;
- ctx.fillRect(p.x,0,p.w,top);ctx.strokeRect(p.x,-3,p.w,top+3);ctx.fillRect(p.x-6,top-22,p.w+12,22);ctx.strokeRect(p.x-6,top-22,p.w+12,22);
- ctx.fillRect(p.x,bot,p.w,H-bot);ctx.strokeRect(p.x,bot,p.w,H-bot);ctx.fillRect(p.x-6,bot,p.w+12,22);ctx.strokeRect(p.x-6,bot,p.w+12,22)
+ const top=p.gapY-p.gap/2;
+ const bottom=p.gapY+p.gap/2;
+
+ const g=ctx.createLinearGradient(p.x,0,p.x+p.w,0);
+ g.addColorStop(0,"#159900");
+ g.addColorStop(.45,"#75ff21");
+ g.addColorStop(1,"#13b700");
+
+ ctx.fillStyle=g;
+ ctx.strokeStyle="#08762a";
+ ctx.lineWidth=4;
+
+ ctx.fillRect(p.x,0,p.w,top);
+ ctx.strokeRect(p.x,-3,p.w,top+3);
+
+ ctx.fillRect(p.x-6,top-22,p.w+12,22);
+ ctx.strokeRect(p.x-6,top-22,p.w+12,22);
+
+ ctx.fillRect(p.x,bottom,p.w,H-bottom);
+ ctx.strokeRect(p.x,bottom,p.w,H-bottom);
+
+ ctx.fillRect(p.x-6,bottom,p.w+12,22);
+ ctx.strokeRect(p.x-6,bottom,p.w+12,22);
 }
+
 function drawBird(){
- const skin=skins[selected%skins.length];ctx.save();ctx.translate(bird.x,bird.y);ctx.rotate(bird.rot);
- ctx.fillStyle=skin.color;ctx.strokeStyle='#182238';ctx.lineWidth=3;
- ctx.beginPath();ctx.ellipse(0,0,23,19,0,0,Math.PI*2);ctx.fill();ctx.stroke();
- ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(7,-8,8,10,0,0,Math.PI*2);ctx.fill();ctx.stroke();
- ctx.fillStyle='#111';ctx.beginPath();ctx.arc(9,-7,3,0,7);ctx.fill();
- ctx.fillStyle='#ff5b00';ctx.beginPath();ctx.moveTo(18,0);ctx.lineTo(34,5);ctx.lineTo(18,10);ctx.closePath();ctx.fill();ctx.stroke();
- ctx.fillStyle='#ff5757';ctx.beginPath();ctx.ellipse(-9,5,11,7,-.3,0,7);ctx.fill();ctx.stroke();
- ctx.restore()
+ const skin=skins[selected%skins.length];
+
+ ctx.save();
+ ctx.translate(bird.x,bird.y);
+ ctx.rotate(bird.rot);
+
+ ctx.fillStyle=skin.color;
+ ctx.strokeStyle="#182238";
+ ctx.lineWidth=3;
+
+ ctx.beginPath();
+ ctx.ellipse(0,0,23,19,0,0,Math.PI*2);
+ ctx.fill();
+ ctx.stroke();
+
+ ctx.fillStyle="#fff";
+ ctx.beginPath();
+ ctx.ellipse(7,-8,8,10,0,0,Math.PI*2);
+ ctx.fill();
+ ctx.stroke();
+
+ ctx.fillStyle="#111";
+ ctx.beginPath();
+ ctx.arc(9,-7,3,0,7);
+ ctx.fill();
+
+ ctx.fillStyle="#ff5b00";
+ ctx.beginPath();
+ ctx.moveTo(18,0);
+ ctx.lineTo(34,5);
+ ctx.lineTo(18,10);
+ ctx.closePath();
+ ctx.fill();
+ ctx.stroke();
+
+ ctx.fillStyle="#ff5757";
+ ctx.beginPath();
+ ctx.ellipse(-9,5,11,7,-.3,0,7);
+ ctx.fill();
+ ctx.stroke();
+
+ ctx.restore();
 }
+
 function draw(){
- let sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#0788ff');sky.addColorStop(.66,'#38d8ff');sky.addColorStop(1,'#b0f7ff');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
- cloud(40,210);cloud(290,270,.75);cloud(145,365,.65);
- ctx.fillStyle='rgba(25,128,205,.3)';for(let x=0;x<W;x+=35){let h=35+(x*7%65);ctx.fillRect(x,H-110-h,27,h)}
+ const sky=ctx.createLinearGradient(0,0,0,H);
+ sky.addColorStop(0,"#0788ff");
+ sky.addColorStop(.66,"#38d8ff");
+ sky.addColorStop(1,"#b0f7ff");
+
+ ctx.fillStyle=sky;
+ ctx.fillRect(0,0,W,H);
+
+ cloud(40,210);
+ cloud(290,270,.75);
+ cloud(145,365,.65);
+
+ ctx.fillStyle="rgba(25,128,205,.3)";
+ for(let x=0;x<W;x+=35){
+  const h=35+(x*7%65);
+  ctx.fillRect(x,H-110-h,27,h);
+ }
+
  pipes.forEach(drawPipe);
- coins.forEach(c=>{ctx.save();ctx.translate(c.x,c.y);ctx.fillStyle='#ffb900';ctx.strokeStyle='#fff22b';ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,0,13,0,7);ctx.fill();ctx.stroke();ctx.fillStyle='#fff';ctx.font='bold 17px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('$',0,1);ctx.restore()});
- if(bird)drawBird();
- let gy=H-55;ctx.fillStyle='#39df18';ctx.fillRect(0,gy,W,15);ctx.fillStyle='#8bff31';ctx.fillRect(0,gy,W,6);ctx.fillStyle='#ed9b3b';ctx.fillRect(0,gy+15,W,40);ctx.fillStyle='#c76a27';for(let x=-36+ground;x<W+36;x+=36){ctx.beginPath();ctx.moveTo(x,gy+15);ctx.lineTo(x+18,gy+27);ctx.lineTo(x+36,gy+15);ctx.lineTo(x+18,gy+40);ctx.fill()}
- if(state==='playing'){ctx.font='bold 42px Arial';ctx.textAlign='center';ctx.lineWidth=5;ctx.strokeStyle='#071b3d';ctx.fillStyle='#fff';ctx.strokeText(score,W/2,175);ctx.fillText(score,W/2,175)}
+
+ coins.forEach(c=>{
+  ctx.save();
+  ctx.translate(c.x,c.y);
+  ctx.fillStyle="#ffb900";
+  ctx.strokeStyle="#fff22b";
+  ctx.lineWidth=4;
+
+  ctx.beginPath();
+  ctx.arc(0,0,13,0,7);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle="#fff";
+  ctx.font="bold 17px Arial";
+  ctx.textAlign="center";
+  ctx.textBaseline="middle";
+  ctx.fillText("$",0,1);
+
+  ctx.restore();
+ });
+
+ if(bird) drawBird();
+
+ const gy=H-55;
+
+ ctx.fillStyle="#39df18";
+ ctx.fillRect(0,gy,W,15);
+
+ ctx.fillStyle="#8bff31";
+ ctx.fillRect(0,gy,W,6);
+
+ ctx.fillStyle="#ed9b3b";
+ ctx.fillRect(0,gy+15,W,40);
+
+ ctx.fillStyle="#c76a27";
+
+ for(let x=-36+ground;x<W+36;x+=36){
+  ctx.beginPath();
+  ctx.moveTo(x,gy+15);
+  ctx.lineTo(x+18,gy+27);
+  ctx.lineTo(x+36,gy+15);
+  ctx.lineTo(x+18,gy+40);
+  ctx.fill();
+ }
+
+ if(state==="playing"){
+  ctx.font="bold 42px Arial";
+  ctx.textAlign="center";
+  ctx.lineWidth=5;
+  ctx.strokeStyle="#071b3d";
+  ctx.fillStyle="#fff";
+  ctx.strokeText(score,W/2,175);
+  ctx.fillText(score,W/2,175);
+ }
 }
-function loop(t){let dt=last?Math.min((t-last)/1000,.035):0;last=t;update(dt);draw();requestAnimationFrame(loop)}
-$('startBtn').onclick=startGame;$('openGarageBtn').onclick=openGarage;$('soundBtn').onclick=()=>{sound=!sound;menu()};
-$('playBtn').onclick=()=>{if(state==='playing'){state='paused';menu('PAUSED','Game paused. Ready to continue?','▶ RESUME');$('startBtn').onclick=()=>{state='playing';hide()}}else if(state==='paused'){state='playing';hide()}else if(state==='levelup'){state='playing';hide()}else startGame()};
-$('homeBtn').onclick=()=>{reset();menu()};
-$('garageBtn').onclick=openGarage;
-canvas.addEventListener('pointerdown',e=>{e.preventDefault();if(state==='playing')fly();else if(state==='levelup'){state='playing';hide()}else if(state==='menu'||state==='over'){startGame();fly()}});
-document.addEventListener('keydown',e=>{if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();if(state==='playing')fly();else if(state==='levelup'){state='playing';hide()}else startGame()}});
-reset();ui();requestAnimationFrame(loop);
+
+function loop(t){
+ const dt=last?Math.min((t-last)/1000,.035):0;
+ last=t;
+ update(dt);
+ draw();
+ requestAnimationFrame(loop);
+}
+
+$("startBtn").onclick=startGame;
+$("openGarageBtn").onclick=openGarage;
+
+$("soundBtn").onclick=()=>{
+ sound=!sound;
+ showMenu("FLAPPY<span>BIRD</span>",
+ "Har 20 pipes cross karne par next level unlock hoga!");
+};
+
+$("playBtn").onclick=()=>{
+ if(state==="playing"){
+  state="paused";
+  $("playBtn").textContent="▶ RESUME";
+  showMenu("PAUSED","Game pause ho gaya hai.","▶ RESUME");
+  $("startBtn").onclick=()=>{
+   state="playing";
+   hideOverlay();
+   $("playBtn").textContent="⏸ PAUSE";
+  };
+ }else if(state==="paused"){
+  state="playing";
+  hideOverlay();
+  $("playBtn").textContent="⏸ PAUSE";
+ }else if(state==="levelup"){
+  state="playing";
+  hideOverlay();
+  $("playBtn").textContent="⏸ PAUSE";
+ }else{
+  startGame();
+ }
+};
+
+$("homeBtn").onclick=()=>{
+ reset();
+ $("playBtn").textContent="▶ PLAY";
+ showMenu("FLAPPY<span>BIRD</span>",
+ "100 levels unlock karein aur apni favourite skin chunein!");
+};
+
+$("garageBtn").onclick=openGarage;
+
+canvas.addEventListener("pointerdown",e=>{
+ e.preventDefault();
+
+ if(state==="playing"){
+  fly();
+ }else if(state==="levelup"){
+  state="playing";
+  hideOverlay();
+ }else if(state==="menu" || state==="over"){
+  startGame();
+  fly();
+ }
+});
+
+document.addEventListener("keydown",e=>{
+ if(e.code==="Space" || e.code==="ArrowUp"){
+  e.preventDefault();
+
+  if(state==="playing"){
+   fly();
+  }else if(state==="levelup"){
+   state="playing";
+   hideOverlay();
+  }else if(state==="paused"){
+   state="playing";
+   hideOverlay();
+  }else{
+   startGame();
+  }
+ }
+});
+
+reset();
+updateUI();
+requestAnimationFrame(loop);
+
 })();
 </script>
 </body>
-</html>'''
-path = Path("/mnt/data/flappy_bird_100_levels_garage.html")
-path.write_text(html, encoding="utf-8")
-print(path, path.stat().st_size)
+</html>
