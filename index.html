@@ -7,9 +7,107 @@
 
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Arial;background:#071b3d;touch-action:manipulation}
-#app{position:relative;width:min(100vw,56.25vh);height:min(100dvh,177.78vw);max-height:100dvh;margin:auto;overflow:hidden;background:#13bdf6}
-canvas{width:100%;height:100%;display:block;touch-action:none}
+/* ANDROID MOBILE FULL SCREEN */
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: fixed;
+    inset: 0;
+    font-family: Arial, sans-serif;
+    background: #071b3d;
+    touch-action: manipulation;
+    overscroll-behavior: none;
+}
+
+#app {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100%;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #13bdf6;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: none;
+}
+
+/* MOBILE HUD */
+
+.hud {
+    position: absolute;
+    top: max(8px, env(safe-area-inset-top));
+    left: 7px;
+    right: 7px;
+    display: flex;
+    gap: 5px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.badge {
+    flex: 1;
+    min-width: 0;
+    padding: 7px 2px;
+    text-align: center;
+    color: white;
+    background: #071b3d;
+    border: 2px solid #00d9ff;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* BOTTOM MOBILE BUTTONS */
+
+.bottom {
+    position: absolute;
+    z-index: 2;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    left: 3%;
+    width: 94%;
+    display: flex;
+    gap: 5px;
+}
+
+button {
+    min-width: 0;
+    cursor: pointer;
+    border: 2px solid #061632;
+    border-radius: 10px;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 2px;
+    flex: 1;
+    background: linear-gradient(#13caff, #075dff);
+}
+
+/* ANDROID PORTRAIT MODE */
+
+@media screen and (orientation: landscape) {
+    #app {
+        width: 100vw;
+        height: 100dvh;
+    }
+}
 
 .hud{position:absolute;top:8px;left:7px;right:7px;display:flex;gap:5px;z-index:2;pointer-events:none}
 .badge{flex:1;padding:7px 3px;text-align:center;color:#fff;background:#071b3d;border:2px solid #00d9ff;border-radius:12px;font-size:12px;font-weight:bold}
